@@ -6,18 +6,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
 
 
     private int[][] GridID = new int[3][3]; // i.e. [0 to 3][0 to 3]
-    private char[][] board = new char[3][3];
+    private char[][] board = new char[4][4];
+    public int[] random  = {1,2,3,4,5,6,7,8,9};
+    public int[] randomId = {R.id.btnGrid11,R.id.btnGrid12,R.id.btnGrid13,R.id.btnGrid21,R.id.btnGrid22,R.id.btnGrid23,R.id.btnGrid31,R.id.btnGrid32,R.id.btnGrid33};
 
-    private enum GridCode {
-        BLANK, X, O
-    };
+    boolean userclick = true , computerclick =  false;
+    Button button, button1,button2,button3,button4,button5,button6,button7,button8,button9;
+
 
 
     @Override
@@ -25,17 +26,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button;
-        int id;
-        for (int r = 0; r <= 2; r++) {
-            for (int c = 0; c <= 2; c++) {
-                id = getResources().getIdentifier("btnGrid" + r + c, "id",
-                        getPackageName());
-                GridID[r][c] = id;
+
+        button1 = (Button)findViewById(R.id.btnGrid11);
+        button2 = (Button)findViewById(R.id.btnGrid12);
+        button3 = (Button)findViewById(R.id.btnGrid13);
+        button4 = (Button)findViewById(R.id.btnGrid21);
+        button5 = (Button)findViewById(R.id.btnGrid22);
+        button6 = (Button)findViewById(R.id.btnGrid23);
+        button7 = (Button)findViewById(R.id.btnGrid31);
+        button8 = (Button)findViewById(R.id.btnGrid32);
+        button9 = (Button)findViewById(R.id.btnGrid33);
+
+        button1.setText("");
+        button1.setOnClickListener(this);
+        button2.setText("");
+        button2.setOnClickListener(this);
+        button3.setText("");
+        button3.setOnClickListener(this);
+        button4.setText("");
+        button4.setOnClickListener(this);
+        button5.setText("");
+        button5.setOnClickListener(this);
+        button6.setText("");
+        button6.setOnClickListener(this);
+        button7.setText("");
+        button7.setOnClickListener(this);
+        button8.setText("");
+        button8.setOnClickListener(this);
+        button9.setText("");
+        button9.setOnClickListener(this);
+
+
+        for (int r = 1; r <= 3; r++) {
+            for (int c = 1; c <= 3; c++) {
                 board[r][c] = 'N';
-                button = (Button) findViewById(id);
-                button.setText(""); // seems to be needed
-                button.setOnClickListener(this);
             }
         }
 
@@ -52,182 +76,111 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void resetGrid() {
-        Button button = (Button) findViewById(R.id.btnReset);
+
         button.setText("");
+
         for (int r = 1; r <= 3; r++) {
             for (int c = 1; c <= 3; c++) {
-                button = (Button) findViewById(GridID[r][c]);
-                button.setText("");
+                button1.setText("");
+                button2.setText("");
+                button3.setText("");
+                button4.setText("");
+                button5.setText("");
+                button6.setText("");
+                button7.setText("");
+                button8.setText("");
+                button9.setText("");
             }
         }
 
     }
 
+
+    public void randomclick(){
+
+    }
+
     public void onClick(View v) {
-        Button button = (Button) v;
 
-        if (button == (Button) findViewById(R.id.btnReset)) {
-            if (gameHasEnded())
-                resetGrid();
-            return;
-        }
 
-        if (gameHasEnded() || button.getText() != "")
-            return;
 
-        button.setText("X");
 
-        int xCountByRow[] = new int[4];
-        int oCountByRow[] = new int[4];
-        int xCountByColumn[] = new int[4];
-        int oCountByColumn[] = new int[4];
-        int xCountByDiagonal[] = new int[3];
-        int oCountByDiagonal[] = new int[3];
+        switch (v.getId()){
 
-        GridCode gc[][] = new GridCode[4][4];
+            case R.id.btnGrid11:
 
-        for (int r = 1; r <= 3; r++) {
-            for (int c = 1; c <= 3; c++) {
-                button = (Button) findViewById(GridID[r][c]);
-                if (button.getText() == "X") {
-                    gc[r][c] = GridCode.X;
-                    xCountByRow[r]++;
-                    xCountByColumn[c]++;
-                    if (r == c)
-                        xCountByDiagonal[1]++;
-                    if (r + c == 4)
-                        xCountByDiagonal[2]++;
-                } else if (button.getText() == "O") {
-                    gc[r][c] = GridCode.O;
-                    oCountByRow[r]++;
-                    oCountByColumn[c]++;
-                    if (r == c)
-                        oCountByDiagonal[1]++;
-                    if (r + c == 4)
-                        oCountByDiagonal[2]++;
-                } else {
-                    gc[r][c] = GridCode.BLANK;
-                }
-            }
-        }
-
-        // Have we lost?
-        for (int r = 1; r <= 3; r++) {
-            if (xCountByRow[r] == 3) {
-                declareLoss();
-                return;
-            }
-        }
-        for (int c = 1; c <= 3; c++) {
-            if (xCountByColumn[c] == 3) {
-                declareLoss();
-                return;
-            }
-        }
-        for (int d = 1; d <= 2; d++) {
-            if (xCountByDiagonal[d] == 3) {
-                declareLoss();
-                return;
-            }
-        }
-
-        // Can we win?
-        for (int r = 1; r <= 3; r++) {
-            if (oCountByRow[r] == 2 && xCountByRow[r] == 0) {
-                for (int c = 1; c <= 3; c++) {
-                    if (gc[r][c] == GridCode.BLANK) {
-                        button = (Button) findViewById(GridID[r][c]);
-                        button.setText("O");
-                        declareWin();
-                        return;
+                    if(userclick)
+                    {
+                        button1.setText("X");
+                        button1.setEnabled(false);
+                        board[1][1] = 'X';
+                        userclick = false;
+                        button2.performClick();
+                        onClick(v);
+                    }else
+                    {
+                        button1.setText("O");
+                        button1.setEnabled(false);
+                        board[1][1] = 'O';
+                        userclick = true;
                     }
-                }
-            }
-        }
-        for (int c = 1; c <= 3; c++) {
-            if (oCountByColumn[c] == 2 && xCountByColumn[c] == 0) {
-                for (int r = 1; r <= 3; r++) {
-                    if (gc[r][c] == GridCode.BLANK) {
-                        button = (Button) findViewById(GridID[r][c]);
-                        button.setText("O");
-                        declareWin();
-                        return;
-                    }
-                }
-            }
-        }
-        for (int d = 1; d <= 2; d++) {
-            if (oCountByDiagonal[d] == 2 && xCountByDiagonal[d] == 0) {
-                for (int r = 1; r <= 3; r++) {
-                    int c = (d == 1) ? r : 4 - r;
-                    if (gc[r][c] == GridCode.BLANK) {
-                        button = (Button) findViewById(GridID[r][c]);
-                        button.setText("O");
-                        declareWin();
-                        return;
-                    }
-                }
-            }
+
+
+
+
+                break;
+            case R.id.btnGrid12:
+
+                break;
+            case R.id.btnGrid13:
+
+                break;
+            case R.id.btnGrid21:
+
+                break;
+            case R.id.btnGrid22:
+
+                break;
+            case R.id.btnGrid23:
+
+                break;
+
+            case R.id.btnGrid31:
+
+                break;
+            case R.id.btnGrid32:
+
+                break;
+            case R.id.btnGrid33:
+
+                break;
+
         }
 
-        // Do we need to block a win?
-        for (int r = 1; r <= 3; r++) {
-            if (xCountByRow[r] == 2 && oCountByRow[r] == 0) {
-                for (int c = 1; c <= 3; c++) {
-                    if (gc[r][c] == GridCode.BLANK) {
-                        button = (Button) findViewById(GridID[r][c]);
-                        button.setText("O");
-                        return;
-                    }
-                }
-            }
-        }
-        for (int c = 1; c <= 3; c++) {
-            if (xCountByColumn[c] == 2 && oCountByColumn[c] == 0) {
-                for (int r = 1; r <= 3; r++) {
-                    if (gc[r][c] == GridCode.BLANK) {
-                        button = (Button) findViewById(GridID[r][c]);
-                        button.setText("O");
-                        return;
-                    }
-                }
-            }
-        }
-        for (int d = 1; d <= 2; d++) {
-            if (xCountByDiagonal[d] == 2 && oCountByDiagonal[d] == 0) {
-                for (int r = 1; r <= 3; r++) {
-                    int c = (d == 1) ? r : 4 - r;
-                    if (gc[r][c] == GridCode.BLANK) {
-                        button = (Button) findViewById(GridID[r][c]);
-                        button.setText("O");
-                        return;
-                    }
-                }
-            }
-        }
+
 
         // TODO:
         // Can we create a double threat?
         // Do we need to prevent a double threat?
 
         // Move randomly
-        Button buttons[] = new Button[9];
-        int buttonCount = 0;
-        for (int r = 1; r <= 3; r++) {
-            for (int c = 1; c <= 3; c++) {
-                if (gc[r][c] == GridCode.BLANK) {
-                    buttonCount++;
-                    buttons[buttonCount] = (Button) findViewById(GridID[r][c]);
-                }
-            }
-        }
-        if (buttonCount == 0) {
-            declareDraw();
-            return;
-        }
-        Random random = new Random();
-        Button randomButton = buttons[random.nextInt(buttonCount) + 1];
-        randomButton.setText("O");
+//        Button buttons[] = new Button[9];
+//        int buttonCount = 0;
+//        for (int r = 1; r <= 3; r++) {
+//            for (int c = 1; c <= 3; c++) {
+//                if (board[r][c] == GridCode.BLANK) {
+//                    buttonCount++;
+//                    buttons[buttonCount] = (Button) findViewById(GridID[r][c]);
+//                }
+//            }
+//        }
+//        if (buttonCount == 0) {
+//            declareDraw();
+//            return;
+//        }
+//        Random random = new Random();
+//        Button randomButton = buttons[random.nextInt(buttonCount) + 1];
+//        randomButton.setText("O");
     }
 
     private void declareSomething(String something) {
